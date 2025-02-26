@@ -85,7 +85,7 @@ void definir_matriz(TCelula **celula, int linha, int coluna) {
         linha_atual = linha_atual->abaixo;
     }
 
-    liberar_bloco(get_celula(*celula, 0, coluna));
+    // liberar_bloco(get_celula(*celula, 0, coluna));
     //liberar_bloco(get_celula(*celula, linha, 0));
 }
 
@@ -113,7 +113,9 @@ int main() {
     TCelula *matriz;
 
     set_matriz(&matriz);
+
     definir_matriz(&matriz, 3, 3);
+    
     set_celula(matriz, 0, 0, 1);
     set_celula(matriz, 0, 1, 2);
     set_celula(matriz, 1, 0, 3);
@@ -121,7 +123,8 @@ int main() {
 
     printf("\n");
 
-    definir_matriz(&matriz, 2, 2);
+    definir_matriz(&matriz, 5, 5);
+    set_celula(matriz, 4, 4, 3);
     print_matriz(matriz);
 
     return 0;
