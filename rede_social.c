@@ -120,7 +120,6 @@ int menu(){
 	printf("1 - Inserir NOVO usuario.\n");
 	printf("2 - Registrar amizade entre usuarios.\n");
 	printf("3 - Indicar novas amizades para usuarios.\n");
-    printf("4 - Mostrar relacionamentos.\n");
 	printf("\nInforme OPCAO desejada: ");
 	scanf("%d", &opcao);
 	
@@ -203,7 +202,7 @@ void print_relacionamentos(TCelula *usuarios, TCelula *relacionamentos) {
     }
 }
 
-void recomendar_relacionamentos(int qtd_usuarios, TCelula *usuarios, TCelula *relacionamentos) {
+void recomendar_relacionamentos(int qtd_usuarios, TCelula *usuarios, TCelula *relacionamentos, int min_relacionamentos) {
     TCelula *recomendacoes = NULL, *linha_atual = relacionamentos, *coluna_atual, *coluna_atual_aux, *usuario_atual = usuarios;
 
     int i, j, k;
@@ -228,7 +227,6 @@ void recomendar_relacionamentos(int qtd_usuarios, TCelula *usuarios, TCelula *re
         linha_atual = linha_atual->abaixo;
     }
 
-    print_matriz(recomendacoes);
     printf("Recomendacoes:\n");
 
     linha_atual = recomendacoes;
@@ -239,14 +237,11 @@ void recomendar_relacionamentos(int qtd_usuarios, TCelula *usuarios, TCelula *re
 
         usuario_atual = usuario_atual->abaixo;
         for (j = 0; j < qtd_usuarios; j++) {
-            if (coluna_atual->integer >= 2) {
-                if (get_celula(relacionamentos, i, j)->boolean) {
-                    continue;
+            if (coluna_atual->integer >= min_relacionamentos) {
+                if (!get_celula(relacionamentos, i, j)->boolean) {
+                    printf("    %s\n",  get_celula(usuarios, j, 0)->string);
                 }
-                
-                printf("   %s\n", i, j, get_celula(usuarios, j, 0)->string);
             }
-            
             coluna_atual = coluna_atual->direita;
         }
         linha_atual = linha_atual->abaixo;
@@ -286,7 +281,7 @@ int main() {
             break;
 
         case 3:
-            recomendar_relacionamentos(qtd_usuarios, usuarios, relacionamentos);
+            recomendar_relacionamentos(qtd_usuarios, usuarios, relacionamentos, 2);
             break;
 
         case 4:
