@@ -269,6 +269,14 @@ int main() {
     set_relacionamento(relacionamentos, 1, 3, true);
     set_relacionamento(relacionamentos, 2, 3, true);
 
+
+    printf("Relacionamentos inciais:\n");
+    printf("A -- B\n");
+    printf("|    |\n");
+    printf("C -- D\n");
+
+    system("PAUSE");
+
     do {
 		opcao = menu();
         switch (opcao) {
