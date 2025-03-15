@@ -1,3 +1,8 @@
+/*
+Resultado do código após explicação do trabalho, usando como base o código do professor.
+Link para o vídeo no canal de quem gravou a aula: https://youtu.be/7-SJELwtNxk
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,8 +14,8 @@ typedef char string[20];
 typedef struct tipoCelula {
 	int valor;
 	string nome;
-	tipoCelula *abaixo;
-	tipoCelula *dir;
+	struct tipoCelula *abaixo;
+	struct tipoCelula *dir;
 } TCelula;
 
 
