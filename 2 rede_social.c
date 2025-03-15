@@ -15,7 +15,7 @@ typedef struct tipoCelula {
 } TCelula;
 
 
-void limpar_buffer() {
+void limparBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
@@ -136,7 +136,7 @@ void inserir_usuario(int *qtd_usuarios, TCelula *usuarios, TCelula  *relacioname
 
     printf("Digite o nome do usuario: ");
 
-    limpar_buffer();
+    limparBuffer();
     fgets(nome, sizeof(nome), stdin);
     nome[strcspn(nome, "\n")] = 0;
 
@@ -228,6 +228,8 @@ void recomendar_relacionamentos(int qtd_usuarios, TCelula *usuarios, TCelula *re
     }
 
     printf("Recomendacoes:\n");
+    print_matriz(recomendacoes);
+    system("PAUSE");
 
     linha_atual = recomendacoes;
     for (i = 0; i < qtd_usuarios; i++) {
@@ -265,7 +267,6 @@ int main() {
 
     set_relacionamento(relacionamentos, 0, 1, true);
     set_relacionamento(relacionamentos, 0, 2, true);
-    set_relacionamento(relacionamentos, 1, 2, true);
     set_relacionamento(relacionamentos, 1, 3, true);
     set_relacionamento(relacionamentos, 2, 3, true);
 
