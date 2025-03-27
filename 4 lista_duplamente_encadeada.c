@@ -4,32 +4,32 @@
 
 typedef struct Node {
     int data;
-    struct Node *prev;
-    struct Node *next;
+    struct Node* prev;
+    struct Node* next;
 } Node;
 
 typedef struct LinkedList {
-    Node *head;
-    Node *tail;
+    Node* head;
+    Node* tail;
     int size;
 } List;
 
-void init(List *list) {
+void init(List* list) {
     list->head = NULL;
     list->tail = NULL;
     list->size = 0;
 }
 
-Node *create_node(int value) {
-    Node *new_node = (Node *)malloc(sizeof(Node));
+Node* create_node(int value) {
+    Node* new_node = (Node*)malloc(sizeof(Node));
     new_node->data = value;
     new_node->prev = NULL;
     new_node->next = NULL;
     return new_node;
 }
 
-void append(List *list, int value) {
-    Node *new_node = create_node(value);
+void append(List* list, int value) {
+    Node* new_node = create_node(value);
 
     if (list->head == NULL) {
         list->head = new_node;
@@ -43,8 +43,8 @@ void append(List *list, int value) {
     list->size++;
 }
 
-void append_ordered(List *list, int data) {
-    Node *new_node = create_node(data), *current;
+void append_ordered(List* list, int data) {
+    Node* new_node = create_node(data), * current;
     bool appended = false;
 
     if (list->head == NULL) {
@@ -64,7 +64,7 @@ void append_ordered(List *list, int data) {
                     current->prev = new_node;
                     break;
                 }
-                    
+
                 current->prev->next = new_node;
                 new_node->prev = current->prev;
 
@@ -80,7 +80,7 @@ void append_ordered(List *list, int data) {
         if (!appended) {
             new_node->prev = list->tail;
             list->tail->next = new_node;
-            
+
             list->tail = new_node;
         }
     }
@@ -88,8 +88,8 @@ void append_ordered(List *list, int data) {
     list->size++;
 }
 
-void remove_(List *list, int value) {
-    Node *current = list->head;
+void remove_(List* list, int value) {
+    Node* current = list->head;
 
     while (current != NULL) {
         if (current->data == value) {
@@ -116,7 +116,7 @@ void remove_(List *list, int value) {
 }
 
 void print_list(List list) {
-    Node *current = list.head;
+    Node* current = list.head;
 
     printf("[");
     while (current != NULL) {
@@ -130,7 +130,7 @@ void print_list(List list) {
 }
 
 void print_list_reverse(List list) {
-    Node *current = list.tail;
+    Node* current = list.tail;
 
     printf("[");
     while (current != NULL) {
@@ -157,6 +157,6 @@ int main() {
     remove_(&list, 7);
     print_list(list);
     print_list_reverse(list);
-    
+
     return 0;
 }

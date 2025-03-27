@@ -19,7 +19,7 @@ typedef struct tipoCelula {
 } TCelula;
 
 
-void limparBuffer() {
+void limpar_buffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
@@ -250,7 +250,7 @@ int menu(){
 void adionarUsuario(TCelula *usuarios, TCelula *relacionamentos, int *qtdUsuarios) {
 	string nome;
 
-    limparBuffer();
+    limpar_buffer();
 
 	printf("Digite o nome do usuario: ");
     fgets(nome, sizeof(nome), stdin);

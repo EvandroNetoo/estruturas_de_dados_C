@@ -10,8 +10,8 @@ typedef struct tipoCelula {
     int integer;
     bool boolean;
     str string;
-    struct tipoCelula *abaixo;
-    struct tipoCelula *direita;
+    struct tipoCelula* abaixo;
+    struct tipoCelula* direita;
 } TCelula;
 
 
@@ -20,12 +20,12 @@ void limparBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-void set_matriz(TCelula **celula) {
+void set_matriz(TCelula** celula) {
     *celula = NULL;
 }
 
-TCelula *alocar_celula() {
-    TCelula *celula = (TCelula *) malloc(sizeof(TCelula));
+TCelula* alocar_celula() {
+    TCelula* celula = (TCelula*)malloc(sizeof(TCelula));
     celula->abaixo = NULL;
     celula->direita = NULL;
     celula->boolean = false;
@@ -35,9 +35,9 @@ TCelula *alocar_celula() {
     return celula;
 }
 
-void definir_matriz(TCelula **celula, int linha, int coluna) {
+void definir_matriz(TCelula** celula, int linha, int coluna) {
     int i, j;
-    TCelula *linha_atual = NULL, *coluna_atual = NULL, *coluna_acima = NULL;
+    TCelula* linha_atual = NULL, * coluna_atual = NULL, * coluna_acima = NULL;
 
     if (*celula == NULL) {
         *celula = alocar_celula();
@@ -47,8 +47,8 @@ void definir_matriz(TCelula **celula, int linha, int coluna) {
 
     for (i = 0; i < linha; i++) {
         coluna_atual = linha_atual;
-        for (j = 1; j < coluna ; j++) {
-            
+        for (j = 1; j < coluna; j++) {
+
             if (coluna_atual->direita == NULL) {
                 coluna_atual->direita = alocar_celula();
             }
@@ -56,7 +56,7 @@ void definir_matriz(TCelula **celula, int linha, int coluna) {
 
             if (coluna_acima != NULL) {
                 coluna_acima->abaixo = coluna_atual;
-                coluna_acima = coluna_acima->direita;             
+                coluna_acima = coluna_acima->direita;
             }
 
         }
@@ -72,7 +72,7 @@ void definir_matriz(TCelula **celula, int linha, int coluna) {
 }
 
 
-TCelula *get_celula(TCelula *celula, int linha, int coluna) {
+TCelula* get_celula(TCelula* celula, int linha, int coluna) {
     int i, j;
     for (i = 0; i < linha; i++) {
         celula = celula->abaixo;
@@ -84,23 +84,23 @@ TCelula *get_celula(TCelula *celula, int linha, int coluna) {
 }
 
 
-void set_int_celula(TCelula *celula, int linha, int coluna, int valor) {
-    TCelula *celula_atual = get_celula(celula, linha, coluna);
-    celula_atual->integer = valor; 
+void set_int_celula(TCelula* celula, int linha, int coluna, int valor) {
+    TCelula* celula_atual = get_celula(celula, linha, coluna);
+    celula_atual->integer = valor;
 }
 
-void set_bool_celula(TCelula *celula, int linha, int coluna, bool valor) {
-    TCelula *celula_atual = get_celula(celula, linha, coluna);
-    celula_atual->boolean = valor; 
+void set_bool_celula(TCelula* celula, int linha, int coluna, bool valor) {
+    TCelula* celula_atual = get_celula(celula, linha, coluna);
+    celula_atual->boolean = valor;
 }
 
-void set_str_celula(TCelula *celula, int linha, int coluna, str valor) {
-    TCelula *celula_atual = get_celula(celula, linha, coluna);
+void set_str_celula(TCelula* celula, int linha, int coluna, str valor) {
+    TCelula* celula_atual = get_celula(celula, linha, coluna);
     strcpy(celula_atual->string, valor);
 }
 
-void print_matriz(TCelula *celula) {
-    TCelula *linha_atual = celula, *coluna_atual = celula;
+void print_matriz(TCelula* celula) {
+    TCelula* linha_atual = celula, * coluna_atual = celula;
     while (linha_atual != NULL) {
         coluna_atual = linha_atual;
         while (coluna_atual != NULL) {
@@ -112,26 +112,26 @@ void print_matriz(TCelula *celula) {
     }
 }
 
-int menu(){
-	int opcao;
-	system("CLS");
-	printf("=====| MENU |======\n\n");
-	printf("0 - Sair (Encerrar Aplicacao).\n");
-	printf("1 - Inserir NOVO usuario.\n");
-	printf("2 - Registrar amizade entre usuarios.\n");
-	printf("3 - Indicar novas amizades para usuarios.\n");
-	printf("\nInforme OPCAO desejada: ");
-	scanf("%d", &opcao);
-	
-	if((opcao > 4) || (opcao < 0)){
-		printf("\n\n\tERRO:\n\tOPCAO invalida. Tente novamente.\n\n");
-		system("PAUSE");
-	}
-	
-	return opcao;
+int menu() {
+    int opcao;
+    system("CLS");
+    printf("=====| MENU |======\n\n");
+    printf("0 - Sair (Encerrar Aplicacao).\n");
+    printf("1 - Inserir NOVO usuario.\n");
+    printf("2 - Registrar amizade entre usuarios.\n");
+    printf("3 - Indicar novas amizades para usuarios.\n");
+    printf("\nInforme OPCAO desejada: ");
+    scanf("%d", &opcao);
+
+    if ((opcao > 4) || (opcao < 0)) {
+        printf("\n\n\tERRO:\n\tOPCAO invalida. Tente novamente.\n\n");
+        system("PAUSE");
+    }
+
+    return opcao;
 }
 
-void inserir_usuario(int *qtd_usuarios, TCelula *usuarios, TCelula  *relacionamentos){
+void inserir_usuario(int* qtd_usuarios, TCelula* usuarios, TCelula* relacionamentos) {
     str nome;
 
     printf("Digite o nome do usuario: ");
@@ -144,14 +144,14 @@ void inserir_usuario(int *qtd_usuarios, TCelula *usuarios, TCelula  *relacioname
 
     definir_matriz(&usuarios, *qtd_usuarios, 1);
     definir_matriz(&relacionamentos, *qtd_usuarios, *qtd_usuarios);
-    
+
     set_str_celula(usuarios, *qtd_usuarios - 1, 0, nome);
 
     printf("Usuario inserido com sucesso!\n");
     system("PAUSE");
 }
 
-void print_usuarios(TCelula *celula) {
+void print_usuarios(TCelula* celula) {
     int i = 0;
     while (celula != NULL) {
         printf("%d - %s\n", i++, celula->string);
@@ -159,12 +159,12 @@ void print_usuarios(TCelula *celula) {
     }
 }
 
-void set_relacionamento(TCelula *relacionametos, int indice_user1, int indice_user2, bool amigos) {
+void set_relacionamento(TCelula* relacionametos, int indice_user1, int indice_user2, bool amigos) {
     set_bool_celula(relacionametos, indice_user1, indice_user2, amigos);
     set_bool_celula(relacionametos, indice_user2, indice_user1, amigos);
 }
 
-void add_relacionamento(TCelula *usuarios, TCelula *relacionametos) {
+void add_relacionamento(TCelula* usuarios, TCelula* relacionametos) {
     int indice_user1, indice_user2;
     print_usuarios(usuarios);
     printf("Digite os indices dos usuários separados por espaço: ");
@@ -173,8 +173,8 @@ void add_relacionamento(TCelula *usuarios, TCelula *relacionametos) {
 }
 
 
-void print_relacionamentos(TCelula *usuarios, TCelula *relacionamentos) {
-    TCelula *linha_atual = relacionamentos, *coluna_atual, *usuario_atual = usuarios;
+void print_relacionamentos(TCelula* usuarios, TCelula* relacionamentos) {
+    TCelula* linha_atual = relacionamentos, * coluna_atual, * usuario_atual = usuarios;
     int biggest_name = 0, name_len;
 
     while (usuario_atual != NULL) {
@@ -194,7 +194,7 @@ void print_relacionamentos(TCelula *usuarios, TCelula *relacionamentos) {
 
         usuario_atual = usuario_atual->abaixo;
         while (coluna_atual != NULL) {
-                printf("%d ", coluna_atual->boolean);
+            printf("%d ", coluna_atual->boolean);
             coluna_atual = coluna_atual->direita;
         }
         printf("\n");
@@ -202,8 +202,8 @@ void print_relacionamentos(TCelula *usuarios, TCelula *relacionamentos) {
     }
 }
 
-void recomendar_relacionamentos(int qtd_usuarios, TCelula *usuarios, TCelula *relacionamentos, int min_relacionamentos) {
-    TCelula *recomendacoes = NULL, *linha_atual = relacionamentos, *coluna_atual, *coluna_atual_aux, *usuario_atual = usuarios;
+void recomendar_relacionamentos(int qtd_usuarios, TCelula* usuarios, TCelula* relacionamentos, int min_relacionamentos) {
+    TCelula* recomendacoes = NULL, * linha_atual = relacionamentos, * coluna_atual, * coluna_atual_aux, * usuario_atual = usuarios;
 
     int i, j, k;
 
@@ -241,21 +241,21 @@ void recomendar_relacionamentos(int qtd_usuarios, TCelula *usuarios, TCelula *re
         for (j = 0; j < qtd_usuarios; j++) {
             if (coluna_atual->integer >= min_relacionamentos) {
                 if (!get_celula(relacionamentos, i, j)->boolean) {
-                    printf("    %s\n",  get_celula(usuarios, j, 0)->string);
+                    printf("    %s\n", get_celula(usuarios, j, 0)->string);
                 }
             }
             coluna_atual = coluna_atual->direita;
         }
         linha_atual = linha_atual->abaixo;
     }
-    
+
     system("PAUSE");
 }
 
 
 int main() {
     int opcao, qtd_usuarios = 4;
-    TCelula *usuarios = NULL, *relacionamentos = NULL;
+    TCelula* usuarios = NULL, * relacionamentos = NULL;
 
     definir_matriz(&usuarios, qtd_usuarios, 1);
     set_str_celula(usuarios, 0, 0, "A");
@@ -279,12 +279,12 @@ int main() {
     system("PAUSE");
 
     do {
-		opcao = menu();
+        opcao = menu();
         switch (opcao) {
         case 1:
             inserir_usuario(&qtd_usuarios, usuarios, relacionamentos);
             break;
-        
+
         case 2:
             add_relacionamento(usuarios, relacionamentos);
             break;
@@ -297,11 +297,11 @@ int main() {
             print_relacionamentos(usuarios, relacionamentos);
             system("PAUSE");
             break;
-        
+
         default:
             break;
         }
-	} while(opcao != 0);
+    } while (opcao != 0);
 
     return 0;
 }
