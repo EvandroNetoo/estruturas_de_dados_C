@@ -19,9 +19,9 @@ typedef char string[40];
 typedef struct Disciplina {
 	string nome;
 	int carga_horaria;
+	struct PreRequisito *pre_requisitos;	
 	struct Disciplina *ante;
 	struct Disciplina *prox;
-	struct PreRequisito *preRequisitos;	
 } Disciplina;
 
 
@@ -85,6 +85,16 @@ void limparBuffer() {
 }
 
 
+#define obter(lista, index, variavel) do { \
+	variavel = lista; \
+	int i = 1; \
+	while (variavel != NULL && i != index) { \
+		variavel = variavel->prox; \
+		i++; \
+	} \
+} while(0)
+
+
 #define listar(lista, tipo, formato, ...) do { \
     tipo *aux = (lista); \
     int i = 1; \
@@ -113,18 +123,16 @@ void limparBuffer() {
 } while(0)
 
 
-#define excluir_por_referencia(lista, referencia, tipo) do { \
-    if (referencia != NULL && i == index) { \
-		if (referencia->ante == NULL) { \
-			lista = referencia->prox; \
-		} else if (referencia->prox == NULL) { \
-			referencia->ante->prox = NULL; \
-        } else { \
-			referencia->ante->prox = referencia->prox; \
-			referencia->prox->ante = aux->ante; \
-		} \
-        free(aux); \
-    } \
+#define excluir_por_referencia(lista, referencia) do { \
+	if (referencia->ante == NULL) { \
+		lista = referencia->prox; \
+	} else if (referencia->prox == NULL) { \
+		referencia->ante->prox = NULL; \
+	} else { \
+		referencia->ante->prox = referencia->prox; \
+		referencia->prox->ante = referencia->ante; \
+	} \
+	free(referencia); \
 } while(0)
 
 
@@ -135,7 +143,21 @@ void limparBuffer() {
         aux = aux->prox; \
         i++; \
     } \
-	excluir_por_referencia(lista, aux, tipo); \
+	if (referencia != NULL && i == index) { \
+		excluir_por_referencia(lista, aux); \
+	} \
+} while(0)
+
+
+#define excluir_lista(lista, tipo) do { \
+	tipo *aux = lista; \
+	tipo *temp = aux; \
+	while (aux != NULL) { \
+		temp = aux; \
+		aux = aux->prox; \
+		free(temp); \
+	} \
+	lista = NULL; \
 } while(0)
 
 
@@ -143,7 +165,7 @@ void inserir_disciplina(Lista *lista) {
     Disciplina *disciplina = (Disciplina *) malloc(sizeof(Disciplina));
     disciplina->ante = NULL;
     disciplina->prox = NULL;
-    disciplina->preRequisitos = NULL;
+    disciplina->pre_requisitos = NULL;
 
     printf("Inserir Disciplina\n\n");
 
@@ -174,6 +196,7 @@ void listar_disciplinas(Disciplina *disciplina) {
 
 void excluir_disciplina(Lista *lista) {
     int index;
+
     printf("Excluir Disciplina\n\n");
     listar(lista->disciplinas, Disciplina, "%d - %s (%d horas)\n", aux->nome, aux->carga_horaria);
 
@@ -191,7 +214,12 @@ void excluir_disciplina(Lista *lista) {
         return;
     }
 
-    excluir_por_index(lista->disciplinas, index, Disciplina);
+	Disciplina *disciplina;
+	obter(lista->disciplinas, index, disciplina);
+
+	excluir_lista(disciplina->pre_requisitos, PreRequisito);
+
+    excluir_por_referencia(lista->disciplinas, disciplina);
     system("PAUSE");
 }
 
@@ -213,19 +241,19 @@ int main() {
 				excluir_disciplina(&lista);
 				break;
 			case 3:
-				printf("Inserir Cursos\n");
+				printf("Inserir Curso\n");
 				break;
 			case 4:
-				printf("Excluir Cursos\n");
+				printf("Excluir Curso\n");
 				break;
 			case 5:
-				printf("Registrar Pre-Requisitos para Disciplinas\n");
+				printf("Registrar Pre-Requisitos para Disciplina\n");
 				break;
 			case 6:
-				printf("Excluir Pre-Requisitos de Disciplinas\n");
+				printf("Excluir Pre-Requisitos de Disciplina\n");
 				break;
 			case 7:
-				printf("Registrar Grade Curricular para Cursos\n");
+				printf("Registrar Grade Curricular para Curso\n");
 				break;
 			case 8:
 				printf("Excluir item da Grade Curricular de Cursos\n");
