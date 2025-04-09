@@ -78,8 +78,6 @@ int menu() {
 	printf("11 - Registrar GRADE CURRICULAR para CURSO.\n");
 	printf("12 - Excluir item da GRADE CURRICULAR de CURSO.\n\n");
 
-	printf("13 - Listagem detalhada\n\n");
-
 	printf("Informe a OPCAO desejada: ");
 	scanf("%d", &opcao);
 
@@ -192,7 +190,7 @@ void listar_disciplinas(Lista* lista) {
 }
 
 
-Disciplina* inserir_disciplina(Lista* lista, string nome="", int carga_horaria=0) {
+Disciplina* inserir_disciplina(Lista* lista) {
 	Disciplina* disciplina = (Disciplina*)malloc(sizeof(Disciplina));
 	disciplina->ante = NULL;
 	disciplina->prox = NULL;
@@ -528,41 +526,6 @@ void excluir_grade_curricular(Lista* lista) {
 }
 
 
-void listagem_detalhada(Lista* lista) {
-	printf("Listagem detalhada\n");
-
-	Curso* curso = lista->cursos;
-	while (curso != NULL) {
-		printf("Curso: %s\n", curso->nome);
-
-		Grade* grade = curso->grades_curriculares;
-		while (grade != NULL) {
-			printf("Período: %d\n", grade->periodo);
-
-			Disciplina* disciplina = grade->disciplinas;
-			while (disciplina != NULL) {
-				printf("    Disciplina: %s (%d horas)\n", disciplina->nome, disciplina->carga_horaria);
-
-				PreRequisito* pre_requisito = disciplina->pre_requisitos;
-				while (pre_requisito != NULL) {
-					printf("        Pré-requisito: %s (%d horas)\n", pre_requisito->disciplina->nome, pre_requisito->disciplina->carga_horaria);
-					pre_requisito = pre_requisito->prox;
-				}
-
-				disciplina = disciplina->prox;
-			}
-
-			grade = grade->prox;
-		}
-
-		curso = curso->prox;
-	}
-
-	system("PAUSE");
-}
-
-
-
 int main() {
 #ifdef _WIN32
 	SetConsoleOutputCP(CP_UTF8);
@@ -612,9 +575,6 @@ int main() {
 				break;
 			case 12:
 				excluir_grade_curricular(lista);
-				break;
-			case 13:
-				listagem_detalhada(lista);
 				break;
 		}
 	} while (opcao != 0);
