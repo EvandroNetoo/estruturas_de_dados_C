@@ -35,7 +35,7 @@ typedef struct PreRequisito {
 
 
 typedef struct Grade {
-	Disciplina* disciplinas;
+	Disciplina* disciplina;
 	int periodo;
 	struct Grade* ante;
 	struct Grade* prox;
@@ -54,6 +54,12 @@ typedef struct Lista {
 	Curso* cursos;
 	Disciplina* disciplinas;
 } Lista;
+
+
+void limpar_buffer() {
+	int c;
+	while ((c = getchar()) != '\n' && c != EOF);
+}
 
 
 int menu() {
@@ -89,13 +95,6 @@ int menu() {
 }
 
 
-void limpar_buffer() {
-	int c;
-	while ((c = getchar()) != '\n' && c != EOF)
-		;
-}
-
-
 #define obter(lista, index, variavel) do { \
 	variavel = lista; \
 	int i = 1; \
@@ -109,7 +108,7 @@ void limpar_buffer() {
 
 #define listar(lista, tipo, formato, ...) do { \
 	printf("\n"); \
-	tipo *aux = (lista); \
+	tipo *aux = lista; \
 	int i = 1; \
 	if (aux == NULL) { \
 		printf("Nenhum item cadastrado.\n"); \
@@ -126,19 +125,16 @@ void limpar_buffer() {
 
 
 #define inserir(lista, novo, tipo) do { \
-	if ((lista) == NULL) \
-	{ \
-		(lista) = (novo); \
+	if (lista == NULL) { \
+		lista = novo; \
 	} \
-	else \
-	{ \
-		tipo *aux = (lista); \
-		while (aux->prox != NULL) \
-		{ \
+	else { \
+		tipo *aux = lista; \
+		while (aux->prox != NULL) { \
 			aux = aux->prox; \
 		} \
-		aux->prox = (novo); \
-		(novo)->ante = aux; \
+		aux->prox = novo; \
+		novo->ante = aux; \
 	} \
 } while (0)
 
@@ -240,6 +236,18 @@ void excluir_disciplina(Lista* lista) {
 	excluir_lista(disciplina->pre_requisitos, PreRequisito);
 
 	excluir_por_referencia(lista->disciplinas, disciplina);
+
+	Curso* curso = lista->cursos;
+	while (curso != NULL) {
+		Grade* grade = curso->grades_curriculares;
+		while (grade != NULL) {
+			if (grade->disciplina == disciplina) {
+				excluir_por_referencia(curso->grades_curriculares, grade);
+			}
+			grade = grade->prox;
+		}
+		curso = curso->prox;
+	}
 
 	printf("\nDisciplina excluída com sucesso!\n\n");
 	system("PAUSE");
@@ -426,13 +434,8 @@ void listar_grades_curriculares(Lista* lista) {
 		return;
 	}
 
-	printf("\nGrade Curricular do Curso %s:\n", curso->nome);
-	Grade* grade = curso->grades_curriculares;
-	while (grade != NULL) {
-		printf("Período: %d\n", grade->periodo);
-		listar(grade->disciplinas, Disciplina, "    %d - %s (%d horas)\n", i, aux->nome, aux->carga_horaria);
-		grade = grade->prox;
-	}
+	printf("\nGrades Curriculares do Curso %s:\n", curso->nome);
+	listar(curso->grades_curriculares, Grade, "%s (%d horas) - Período %d\n", aux->disciplina->nome, aux->disciplina->carga_horaria, aux->periodo);
 
 	system("PAUSE");
 }
@@ -457,36 +460,30 @@ void inserir_grade_curricular(Lista* lista) {
 	Grade* grade = (Grade*)malloc(sizeof(Grade));
 	grade->ante = NULL;
 	grade->prox = NULL;
+	grade->disciplina = NULL;
 
 	printf("Informe o período da grade curricular: ");
 	scanf("%d", &grade->periodo);
 
-	int qtd_disciplinas, i;
-	printf("Informe a quantidade de disciplinas: ");
-	scanf("%d", &qtd_disciplinas);
-	for (i = 0; i < qtd_disciplinas; i++) {
-		system("CLS");
-		printf("Registrar Disciplina para o Período %d do curso %s\n", grade->periodo, curso->nome);
+	listar(lista->disciplinas, Disciplina, "%d - %s (%d horas)\n", i, aux->nome, aux->carga_horaria);
+	printf("Informe o número da Disciplina: ");
+	scanf("%d", &index);
 
-		Disciplina* disciplina;
-
-		listar(lista->disciplinas, Disciplina, "%d - %s (%d horas)\n", i, aux->nome, aux->carga_horaria);
-		printf("Informe o número da Disciplina: ");
-		scanf("%d", &index);
-
-		obter(lista->disciplinas, index, disciplina);
-		if (disciplina == NULL) {
-			printf("Disciplina não encontrada!\n");
-			i--;
-			system("PAUSE");
-			return;
-		}
-
-		inserir(grade->disciplinas, disciplina, Disciplina);
-
-		printf("\nDisciplina registrada com sucesso!\n\n");
+	Disciplina* disciplina;
+	obter(lista->disciplinas, index, disciplina);
+	if (disciplina == NULL) {
+		printf("Disciplina não encontrada!\n");
 		system("PAUSE");
+		return;
 	}
+
+	grade->disciplina = disciplina;
+
+	inserir(curso->grades_curriculares, grade, Grade);
+
+	printf("\nDisciplina registrada com sucesso!\n\n");
+
+	system("PAUSE");
 }
 
 
@@ -507,9 +504,9 @@ void excluir_grade_curricular(Lista* lista) {
 		return;
 	}
 
-	listar(curso->grades_curriculares, Grade, "%d - Período %d\n", i, aux->periodo);
+	listar(curso->grades_curriculares, Grade, "%d - %s (%d horas) - Período %d\n", i, aux->disciplina->nome, aux->disciplina->carga_horaria, aux->periodo);
 
-	printf("Informe o número do período que deseja excluir: ");
+	printf("Informe o número da grade curricular que deseja excluir: ");
 	scanf("%d", &index);
 
 	Grade* grade;
@@ -522,7 +519,7 @@ void excluir_grade_curricular(Lista* lista) {
 
 	excluir_por_referencia(curso->grades_curriculares, grade);
 
-	printf("\nPeríodo excluído com sucesso!\n\n");
+	printf("\nGrade curricular excluído com sucesso!\n\n");
 }
 
 
@@ -535,7 +532,7 @@ int main() {
 	Lista* lista = (Lista*)malloc(sizeof(Lista));
 	lista->cursos = NULL;
 	lista->disciplinas = NULL;
-	
+
 	do {
 		opcao = menu();
 		system("CLS");
