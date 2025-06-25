@@ -145,7 +145,7 @@ int fator_balanceamento(No* raiz) {
     return altura(raiz->esq) - altura(raiz->dir);
 }
 
-No* balanceamento_LL(No* a) {
+No* balanceamento_LL(No* a, bool* h) {
     printf("LL\n");
     No* b = a->esq;
     a->esq = b->dir;
@@ -154,15 +154,18 @@ No* balanceamento_LL(No* a) {
     if (b->bal == 0) {
         a->bal = 1;
         b->bal = -1;
-    } else {
+        *h = false;
+    }
+    else {
         a->bal = 0;
         b->bal = 0;
+        *h = false;
     }
 
     return b;
 }
 
-No* balanceamento_RR(No* a) {
+No* balanceamento_RR(No* a, bool* h) {
     printf("RR\n");
     No* b = a->dir;
     a->dir = b->esq;
@@ -171,7 +174,8 @@ No* balanceamento_RR(No* a) {
     if (b->bal == 0) {
         a->bal = -1;
         b->bal = 1;
-    } else {
+    }
+    else {
         a->bal = 0;
         b->bal = 0;
     }
@@ -179,7 +183,7 @@ No* balanceamento_RR(No* a) {
     return b;
 }
 
-No* balanceamento_LR(No* a) {
+No* balanceamento_LR(No* a, bool* h) {
     printf("LR\n");
     No* b = a->esq;
     No* c = b->dir;
@@ -193,7 +197,7 @@ No* balanceamento_LR(No* a) {
     return c;
 }
 
-No* balanceamento_RL(No* a) {
+No* balanceamento_RL(No* a, bool* h) {
     printf("RL\n");
     No* b = a->dir;
     No* c = b->esq;
@@ -207,11 +211,11 @@ No* balanceamento_RL(No* a) {
     return c;
 }
 
-No* balancear_avl(No* a, int balanceamento_a, int balanceamento_b) {
-    if (balanceamento_a == 2 && balanceamento_b >= 0) return balanceamento_LL(a);
-    if (balanceamento_a == -2 && balanceamento_b <= 0) return balanceamento_RR(a);
-    if (balanceamento_a == 2 && balanceamento_b == -1) return balanceamento_LR(a);
-    if (balanceamento_a == -2 && balanceamento_b == 1) return balanceamento_RL(a);
+No* balancear_avl(No* a, int balanceamento_a, int balanceamento_b, bool* h) {
+    if (balanceamento_a == 2 && balanceamento_b >= 0) return balanceamento_LL(a, h);
+    if (balanceamento_a == -2 && balanceamento_b <= 0) return balanceamento_RR(a, h);
+    if (balanceamento_a == 2 && balanceamento_b == -1) return balanceamento_LR(a, h);
+    if (balanceamento_a == -2 && balanceamento_b == 1) return balanceamento_RL(a, h);
     return NULL;
 }
 
@@ -225,7 +229,7 @@ void inserir_avl(No** raiz, int valor, bool* cresceu) {
         if (*cresceu) (*raiz)->bal++;
         if ((*raiz)->bal == 0) *cresceu = false;
         if ((*raiz)->bal != -2 && (*raiz)->bal != 2) return;
-        (*raiz) = balancear_avl(*raiz, (*raiz)->bal, (*raiz)->esq->bal);
+        (*raiz) = balancear_avl(*raiz, (*raiz)->bal, (*raiz)->esq->bal, cresceu);
         *cresceu = false;
     }
     else if (valor >= (*raiz)->valor) {
@@ -233,66 +237,91 @@ void inserir_avl(No** raiz, int valor, bool* cresceu) {
         if (*cresceu) (*raiz)->bal--;
         if ((*raiz)->bal == 0) *cresceu = false;
         if ((*raiz)->bal != -2 && (*raiz)->bal != 2) return;
-        (*raiz) = balancear_avl(*raiz, (*raiz)->bal, (*raiz)->dir->bal);
+        (*raiz) = balancear_avl(*raiz, (*raiz)->bal, (*raiz)->dir->bal, cresceu);
         *cresceu = false;
     }
 }
 
 
+
 No* remover_avl(No* raiz, int valor, bool* diminuiu) {
-    No* temp;
-    if (raiz == NULL) return NULL;
+    if (raiz == NULL) {
+        *diminuiu = false;
+        return NULL;
+    }
 
     if (valor < raiz->valor) {
         raiz->esq = remover_avl(raiz->esq, valor, diminuiu);
-        if (*diminuiu) raiz->bal--;
-        printf("-rem: %d v: %d b: %d\n", valor, raiz->valor, raiz->bal);
-        *diminuiu = (raiz->bal == 0)? true : false;
-        if (raiz->bal != -2 && raiz->bal != 2) return raiz;
-        printf("re\n");
-        return balancear_avl(raiz, raiz->bal, raiz->dir->bal);
-    }
-    else if (valor > raiz->valor) {
+        if (*diminuiu) {
+            raiz->bal++;
+            if (raiz->bal == 1) {
+                *diminuiu = false;
+            } else if (raiz->bal == 2) {
+                int bal_esq = (raiz->esq != NULL) ? raiz->esq->bal : 0;
+                No* nova_raiz = balancear_avl(raiz, raiz->bal, bal_esq, diminuiu);
+                if (nova_raiz->bal == 0) {
+                    *diminuiu = true;
+                } else {
+                    *diminuiu = false;
+                }
+                return nova_raiz;
+            }
+        }
+    } else if (valor > raiz->valor) {
         raiz->dir = remover_avl(raiz->dir, valor, diminuiu);
-        if (*diminuiu) raiz->bal++;
-        printf("-rem: %d v: %d b: %d\n", valor, raiz->valor, raiz->bal);
-        *diminuiu = (raiz->bal == 0)? true : false;
-        if (raiz->bal != -2 && raiz->bal != 2) return raiz;
-        printf("re\n");
-        return balancear_avl(raiz, raiz->bal, raiz->esq->bal);
-    }
-    else {
-        if (raiz->dir == NULL) {
-            temp = raiz->esq;
-            free(raiz);
-            *diminuiu = true;
-            return temp;
-        }
-        if (raiz->esq == NULL) {
-            temp = raiz->dir;
-            free(raiz);
-            *diminuiu = true;
-            return temp;
-        }
-
-        temp = maior_no(raiz->esq);
-        raiz->valor = temp->valor;
-        raiz->esq = remover_avl(raiz->esq, temp->valor, diminuiu);
         if (*diminuiu) {
             raiz->bal--;
-            printf("-rem: %d v: %d b: %d\n", temp->valor, raiz->valor, raiz->bal);
-            *diminuiu = (raiz->bal == 0) ? true : false;
+            if (raiz->bal == -1) {
+                *diminuiu = false;
+            } else if (raiz->bal == -2) {
+                int bal_dir = (raiz->dir != NULL) ? raiz->dir->bal : 0;
+                No* nova_raiz = balancear_avl(raiz, raiz->bal, bal_dir, diminuiu);
+                if (nova_raiz->bal == 0) {
+                    *diminuiu = true;
+                } else {
+                    *diminuiu = false;
+                }
+                return nova_raiz;
+            }
+        }
+    } else {
+        if (raiz->esq == NULL || raiz->dir == NULL) {
+            No* temp = raiz->esq ? raiz->esq : raiz->dir;
+            if (temp == NULL) {
+                free(raiz);
+                *diminuiu = true;
+                return NULL;
+            } else {
+                *raiz = *temp;
+                free(temp);
+                *diminuiu = true;
+            }
         } else {
-            *diminuiu = false;
+            No* temp = maior_no(raiz->esq);
+            raiz->valor = temp->valor;
+            bool diminuiu_temp = false;
+            raiz->esq = remover_avl(raiz->esq, temp->valor, &diminuiu_temp);
+            if (diminuiu_temp) {
+                raiz->bal++;
+                if (raiz->bal == 1) {
+                    *diminuiu = false;
+                } else if (raiz->bal == 2) {
+                    int bal_esq = (raiz->esq != NULL) ? raiz->esq->bal : 0;
+                    No* nova_raiz = balancear_avl(raiz, raiz->bal, bal_esq, diminuiu);
+                    if (nova_raiz->bal == 0) {
+                        *diminuiu = true;
+                    } else {
+                        *diminuiu = false;
+                    }
+                    return nova_raiz;
+                }
+            } else {
+                *diminuiu = false;
+            }
         }
-        if (raiz->bal == -2 || raiz->bal == 2) {
-            printf("re\n");
-            return balancear_avl(raiz, raiz->bal, raiz->dir->bal);
-        }
-        return raiz;
     }
+    return raiz;
 }
-
 
 int main() {
     No* raiz = NULL;
@@ -309,15 +338,14 @@ int main() {
     inserir_avl(&raiz, 6, &h);
     inserir_avl(&raiz, 9, &h);
     inserir_avl(&raiz, 11, &h);
-
     
-    //remover_avl(raiz, 4, &h);
+    
+    remover_avl(raiz, 4, &h);
+    imprime_arvore(raiz);
     remover_avl(raiz, 8, &h);
-    // imprime_arvore(raiz);
-    // remover_avl(raiz, 6, &h);
-    // remover_avl(raiz, 5, &h);
-    // remover_avl(raiz, 2, &h);
-    //imprime_arvore(raiz);
+    remover_avl(raiz, 6, &h);
+    remover_avl(raiz, 5, &h);
+    remover_avl(raiz, 2, &h);
     imprime_arvore(raiz);
 
     return 0;
